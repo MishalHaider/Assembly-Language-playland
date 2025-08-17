@@ -1,0 +1,167 @@
+.model small
+.stack 100h
+include Irvine32.inc
+.code
+main PROC
+    
+    mov ax, 5000h    
+    mov bx, 2000h    
+    mov cx, 1000h    
+    
+    sub ax, bx      
+    sub ax, cx
+    
+    call DumpRegs
+    
+    mov ah,4Ch
+    int 21h         
+
+    main ENDP
+    END main 
+
+
+
+##q2
+
+
+org 100h
+.model small
+.stack 100h
+
+.data                        
+
+    uByte    db    255       
+    sByte    db    -128      
+    uWord    dw    65535     
+    sWord    dw    -32768    
+    uDword   dd    4294967295
+    sDword   dd    -2147483648
+    ;shortReal dd   1.25
+    fWord dw 3456h, 789Ah, 0B12h          
+    qWord dd 0x112210F4, 0x112210F4       
+    tByte db 0BBh,0AAh,099h,088h,077h,066h,055h,044h,033h,011h  
+    realfour dd   3.14                      
+    realeight dd 0x8B145769, 0x4005BF0A             
+    realTen db 1h,2h,3h,4h,5h,6h,7h,8h,9h,0Ah     
+
+.code
+main proc
+    mov ax, @data
+    mov ds, ax
+    
+    mov al, uByte    
+    mov bx, sWord  
+
+    
+    mov ah, 4Ch
+    int 21h
+main endp
+end main
+
+
+
+
+#############
+org 100h
+.model small
+.stack 100h
+
+.data                        
+
+    uByte    db    255       
+    sByte    db    -128      
+    uWord    dw    65535     
+    sWord    dw    -32768    
+    uDword   dd    4294967295
+    sDword   dd    -2147483648
+    ;shortReal dd   1.25
+    fWord dw 3456h, 789Ah, 0B12h          
+    qWord dd 0x112210F4, 0x112210F4       
+    tByte db 0BBh,0AAh,099h,088h,077h,066h,055h,044h,033h,011h  
+    realfour dd   3.14                      
+    realeight dd 0x8B145769, 0x4005BF0A             
+    realTen db 1h,2h,3h,4h,5h,6h,7h,8h,9h,0Ah     
+
+.code
+main proc
+    mov ax, @data
+    mov ds, ax
+    
+    mov al, uByte    
+    mov bx, sWord  
+
+    
+    mov ah, 4Ch
+    int 21h
+main endp
+end main
+#####################3
+
+#Q3
+
+.model small
+.stack 100h
+
+.data
+    SUN = 0
+    MON = 1
+    TUE = 2
+    WED = 3
+    THU = 4
+    FRI = 5
+    SAT = 6
+
+    days db SUN, MON, TUE, WED, THU, FRI, SAT
+
+.code
+main proc
+    mov ax, @data
+    mov ds, ax
+    
+    mov ah, 4Ch
+    int 21h
+main endp
+end main
+
+######################
+Q4
+
+.model small
+.stack 100h
+
+.data
+    msgGreeting   db 'Hello, World!', 0Dh, 0Ah, '$'
+    msgPrompt     db 'Enter your name: ', 0Dh, 0Ah, '$'
+    msgFarewell   db 'Goodbye!', 0Dh, 0Ah, '$'
+    msgQuestion   db 'How are you today?', 0Dh, 0Ah, '$'
+    msgWarning    db 'Warning: Invalid input!', 0Dh, 0Ah, '$'
+
+.code
+main proc
+    mov ax, @data
+    mov ds, ax
+
+    mov ah, 09h
+    lea dx, msgGreeting
+    int 21h
+
+    mov ah, 09h
+    lea dx, msgPrompt
+    int 21h
+
+    mov ah, 09h
+    lea dx, msgQuestion
+    int 21h
+
+    mov ah, 09h
+    lea dx, msgWarning
+    int 21h
+
+    mov ah, 09h
+    lea dx, msgFarewell
+    int 21h
+
+    mov ah, 4Ch
+    int 21h
+main endp
+end main
