@@ -165,3 +165,104 @@ main proc
     int 21h
 main endp
 end main
+
+
+
+.model small
+.stack 100h
+.data
+    sqmsg db 'Square of '
+    newline db 13,10,'$'         
+
+.code
+main:
+    mov ax, @data
+    mov ds, ax
+    
+    ;mov bl,10         ;10 to 0
+    mov cx, 11         ;0 to 10
+    mov bl, 0         
+
+print_loop:
+    lea dx, sqmsg
+    mov ah, 09h
+    int 21h
+
+    mov ax, 0
+    mov al, bl        
+    call print_num    
+
+    mov dl, ' '        
+    mov ah, 02h
+    int 21h
+    
+    mov dl, '='
+    mov ah , 02h
+    int 21h  
+    
+    mov dl, ' '
+    mov ah , 02h
+    int 21h
+
+    mov al, bl          
+    mul bl            
+
+    call print_num       
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    inc bl
+    loop print_loop
+    
+    ;dec bl
+    ;cmp bl, 0FFh     
+    ;jg print_loop   
+    
+    mov ah, 4Ch
+    int 21h
+
+
+print_num:
+    push ax
+    push bx
+    push cx
+    push dx
+    xor cx, cx          
+
+print_loop_div:
+    xor dx, dx
+    mov bx, 10
+    div bx             
+    push dx             
+    inc cx              
+    test ax, ax
+    jnz print_loop_div
+
+print_digits:
+    pop dx
+    add dl, '0'
+    mov ah, 02h
+    int 21h
+    loop print_digits
+
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+
+end main   
+
+
+
+;mov dl, 'i'
+ ;   mov ah,02h
+  ;  int 21h  
+  
+    ;mov dl, 's'
+    ;mov ah,02h
+    ;int 21h
+    
+
