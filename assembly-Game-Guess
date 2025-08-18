@@ -1,0 +1,164 @@
+org 100h
+
+.data
+setMsg         db 13,10, "Set your 4-digit password: $"
+confirmMsg     db 13,10, "Confirm your password: $"
+matchMsg       db 13,10, "Password set successfully!$"
+mismatchMsg    db 13,10, "Passwords do not match. Try again.$"
+
+promptMsg      db 13,10, "Enter your password to login: $"
+correctMsg     db 13,10, "Password is correct! Access granted.$"
+wrongMsg       db 13,10, "Wrong password. Try again.$"
+outMsg         db 13,10, "You are out of tries. Access denied.$"
+
+correctIdxMsg  db 13,10, "Correct at index: $"
+wrongIdxMsg    db 13,10, "Wrong at index: $"
+
+password       db 4 dup(?)      ; Original password
+confirm        db 4 dup(?)      ; Confirmation password
+input          db 4 dup(?)      ; User login attempt
+tries          db 3             ; Allow 3 attempts
+
+.code
+
+start:
+    ; Ask to set password
+    mov ah, 09h
+    mov dx, offset setMsg
+    int 21h
+
+    mov cx, 4
+    mov si, 0
+setLoop:
+    mov ah, 07h
+    int 21h
+    mov [password + si], al
+   
+    mov ah, 02h
+    mov dl, '*'
+    int 21h
+    
+    inc si
+    loop setLoop
+
+    ; Confirm password
+    mov ah, 09h
+    mov dx, offset confirmMsg
+    int 21h
+
+    mov cx, 4
+    mov si, 0
+confirmLoop:
+    mov ah, 07h
+    int 21h
+    mov [confirm + si], al
+    mov ah, 02h
+    mov dl, '*'
+    int 21h
+    inc si
+    loop confirmLoop
+
+    ; Compare password and confirmation
+    mov cx, 4
+    mov si, 0
+checkConfirm:
+    mov al, [password + si]
+    cmp al, [confirm + si]
+    jne mismatch
+    inc si
+    loop checkConfirm
+
+    ; Password match
+    mov ah, 09h
+    mov dx, offset matchMsg
+    int 21h
+    jmp login
+
+mismatch:
+    ; Mismatch - try again
+    mov ah, 09h
+    mov dx, offset mismatchMsg
+    int 21h
+    jmp start
+
+; ---------------
+;| Login section  |
+; ---------------
+login:
+    cmp tries, 0
+    je outOfTries
+
+    mov ah, 09h
+    mov dx, offset promptMsg
+    int 21h
+
+    mov cx, 4
+    mov si, 0
+inputLoop:
+    mov ah, 07h
+    int 21h
+    mov [input + si], al
+    mov ah, 02h
+    mov dl, '*'
+    int 21h
+    inc si
+    loop inputLoop
+
+    ; Check if input matches password
+    mov cx, 4
+    mov si, 0
+verifyLoop:
+    mov al, [input + si]
+    cmp al, [password + si]
+    jne wrongPassword
+    inc si
+    loop verifyLoop
+
+    ; Match successful
+    mov ah, 09h
+    mov dx, offset correctMsg
+    int 21h
+    jmp exit
+
+wrongPassword:
+    dec tries
+    mov ah, 09h
+    mov dx, offset wrongMsg
+    int 21h
+
+    ; Show correct/wrong indexes
+    mov cx, 4
+    mov si, 0
+positionCheck:
+    mov al, [input + si]
+    cmp al, [password + si]
+    jne showWrong
+    ; Show correct index
+    mov ah, 09h
+    mov dx, offset correctIdxMsg
+    int 21h
+    jmp showIndex
+
+showWrong:
+    mov ah, 09h
+    mov dx, offset wrongIdxMsg
+    int 21h
+
+showIndex:
+    mov ax, si      ; Move SI to AX
+    mov dl, al      ; Copy lower byte to DL
+    add dl, '0'     ; Convert to ASCII digit
+    mov ah, 02h
+    int 21h
+
+    inc si
+    loop positionCheck
+
+    jmp login
+
+outOfTries:
+    mov ah, 09h
+    mov dx, offset outMsg
+
+exit:
+ret
